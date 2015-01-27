@@ -217,6 +217,20 @@ func TestCreateMultiGeometry(t *testing.T) {
 	}
 }
 
+func TestPolygonize(t *testing.T) {
+	var geoms []*Geometry
+
+	geoms = append(geoms, CreateFromWKT("LINESTRING(0 0, 10 0, 10 10, 0 10, 0 0)"))
+	geoms = append(geoms, CreateFromWKT("LINESTRING(5 -5, 5 15)"))
+
+	geom := Polygonize(geoms)
+	if geom != nil {
+		t.Logf("Log: Polygonize() returns %q", geom.ToWKT())
+	} else {
+		t.Errorf("Error: Polygonize() error")
+	}
+}
+
 func TestClone(t *testing.T) {
 	p1 := CreatePoint(116.39, 39.9)
 	p2 := p1.Clone()
@@ -346,7 +360,6 @@ func TestDistance(t *testing.T) {
 	}
 }
 
-// GEOS 3.2.0+ required
 func TestHausdorffDistance(t *testing.T) {
 	ln1 := CreateLineString([]Coord{
 		Coord{0, 0},
@@ -360,7 +373,6 @@ func TestHausdorffDistance(t *testing.T) {
 	}
 }
 
-// GEOS 3.2.0+ required
 func TestHausdorffDistanceDensify(t *testing.T) {
 	a := CreateFromWKT("LINESTRING (0 0, 100 0, 10 100, 10 100)")
 	b := CreateFromWKT("LINESTRING (0 100, 0 10, 80 10)")
@@ -584,6 +596,12 @@ func TestIsEmpty(t *testing.T) {
 	if pt.IsEmpty() {
 		t.Errorf("Error: IsEmpty() error")
 	}
+
+	empty := CreateFromWKT("GEOMETRYCOLLECTION EMPTY")
+
+	if !empty.IsEmpty() {
+		t.Errorf("Error: IsEmpty() error")
+	}
 }
 
 func TestIsSimple(t *testing.T) {
@@ -628,6 +646,229 @@ func TestIsClosed(t *testing.T) {
 	}
 }
 
+func TestEnvelope(t *testing.T) {
+	var env *Geometry
+
+	pt := CreatePoint(0, 0)
+	env = pt.Envelope()
+
+	if env == nil {
+		t.Errorf("Error: Point.Envelope() error")
+	} else {
+		if env.GetType() != POINT {
+			t.Errorf("Error: Point.Envelope() returns error result")
+		}
+	}
+
+	ln := CreateFromWKT("LINESTRING (0 0, 100 0)")
+	env = ln.Envelope()
+
+	if env == nil {
+		t.Errorf("Error: LineString.Envelope() error")
+	} else {
+		if env.GetType() != POLYGON {
+			t.Errorf("Error: LineString.Envelope() returns error result")
+		}
+	}
+}
+
+func TestIntersection(t *testing.T) {
+	pt := CreateFromWKT("POINT (0 0)")
+	ln := CreateFromWKT("LINESTRING (0 0, 100 0)")
+
+	geom := pt.Intersection(ln)
+
+	if geom == nil {
+		t.Errorf("Error: Intersection() error")
+	} else {
+		t.Logf("Log: Intersection() returns %q", geom.ToWKT())
+	}
+}
+
+func TestConvexHull(t *testing.T) {
+	m := CreateFromWKT("MULTIPOINT ((10 40), (40 30), (20 20), (30 10))")
+	geom := m.ConvexHull()
+
+	if geom == nil {
+		t.Errorf("Error: ConvexHull() error")
+	} else {
+		t.Logf("Log: ConvexHull() returns %q", geom.ToWKT())
+	}
+}
+
+func TestDifference(t *testing.T) {
+	geom1 := CreateFromWKT("LINESTRING (0 0, 100 0)")
+	geom2 := CreateFromWKT("LINESTRING (0 0, 50 0)")
+
+	geom := geom1.Difference(geom2)
+
+	if geom == nil {
+		t.Errorf("Error: Difference() error")
+	} else {
+		t.Logf("Log: Difference() returns %q", geom.ToWKT())
+	}
+}
+
+func TestSymDifference(t *testing.T) {
+	geom1 := CreateFromWKT("LINESTRING (0 0, 100 0)")
+	geom2 := CreateFromWKT("LINESTRING (0 0, 50 0)")
+
+	geom := geom1.SymDifference(geom2)
+
+	if geom == nil {
+		t.Errorf("Error: SymDifference() error")
+	} else {
+		t.Logf("Log: SymDifference() returns %q", geom.ToWKT())
+	}
+}
+
+func TestBoundary(t *testing.T) {
+	ln := CreateFromWKT("LINESTRING (0 0, 100 0)")
+
+	geom := ln.Boundary()
+
+	if geom == nil {
+		t.Errorf("Error: Boundary() error")
+	} else {
+		t.Logf("Log: Boundary() returns %q", geom.ToWKT())
+	}
+}
+
+func TestUnion(t *testing.T) {
+	geom1 := CreateFromWKT("POINT (0 0)")
+	geom2 := CreateFromWKT("LINESTRING (5 0, 10 0)")
+
+	geom := geom1.Union(geom2)
+
+	if geom == nil {
+		t.Errorf("Error: Union() error")
+	} else {
+		t.Logf("Log: Union() returns %q", geom.ToWKT())
+	}
+}
+
+func TestUnaryUnion(t *testing.T) {
+	m := CreateFromWKT("MULTILINESTRING((0 0, 10 0), (5 -5, 5 5))")
+
+	geom := m.UnaryUnion()
+
+	if geom == nil {
+		t.Errorf("Error: UnaryUnion() error")
+	} else {
+		t.Logf("Log: UnaryUnion() returns %q", geom.ToWKT())
+	}
+}
+
+func TestPointOnSurface(t *testing.T) {
+	pg := CreateFromWKT("POLYGON ((0 0, 10 0, 10 10, 5 10, 5 5, 0 5, 0 0))")
+
+	geom := pg.PointOnSurface()
+
+	if geom == nil {
+		t.Errorf("Error: PointOnSurface() error")
+	} else {
+		t.Logf("Log: PointOnSurface() returns %q", geom.ToWKT())
+	}
+}
+
+func TestCentroid(t *testing.T) {
+	pg := CreateFromWKT("POLYGON ((0 0, 10 0, 10 10, 5 10, 5 5, 0 5, 0 0))")
+
+	geom := pg.Centroid()
+
+	if geom == nil {
+		t.Errorf("Error: Centroid() error")
+	} else {
+		t.Logf("Log: Centroid() returns %q", geom.ToWKT())
+	}
+}
+
+func TestNode(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0)")
+
+	geom := g.Node()
+
+	if geom == nil {
+		t.Errorf("Error: Node() error")
+	} else {
+		t.Logf("Log: Node() returns %q", geom.ToWKT())
+	}
+}
+
+func TestSimplify(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0, 10 0)")
+
+	geom := g.Simplify(0)
+
+	if geom == nil {
+		t.Errorf("Error: Simplify() error")
+	} else {
+		t.Logf("Log: Simplify() returns %q", geom.ToWKT())
+	}
+}
+
+func TestTopologyPreserveSimplify(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0.1, 20 0)")
+
+	geom := g.TopologyPreserveSimplify(0.2)
+
+	if geom == nil {
+		t.Errorf("Error: TopologyPreserveSimplify() error")
+	} else {
+		t.Logf("Log: TopologyPreserveSimplify() returns %q", geom.ToWKT())
+	}
+}
+
+func TestExtractUniquePoints(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0, 10 0)")
+
+	geom := g.ExtractUniquePoints()
+
+	if geom == nil {
+		t.Errorf("Error: ExtractUniquePoints() error")
+	} else {
+		t.Logf("Log: ExtractUniquePoints() returns %q", geom.ToWKT())
+	}
+}
+
+func TestSharedPaths(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0)")
+	line := CreateFromWKT("LINESTRING (5 0, 15 0, 8 0)")
+
+	geom := g.SharedPaths(line)
+
+	if geom == nil {
+		t.Errorf("Error: SharedPaths() error")
+	} else {
+		t.Logf("Log: SharedPaths() returns %q", geom.ToWKT())
+	}
+}
+
+func TestSnap(t *testing.T) {
+	g := CreateFromWKT("POINT (0 0)")
+	line := CreateFromWKT("LINESTRING (0 -1, 10 0)")
+
+	geom := g.Snap(line, 2)
+
+	if geom == nil {
+		t.Errorf("Error: Snap() error")
+	} else {
+		t.Logf("Log: Snap() returns %q", geom.ToWKT())
+	}
+}
+
+func TestDelaunayTriangulation(t *testing.T) {
+	g := CreateFromWKT("LINESTRING (0 0, 10 0, 10 10)")
+
+	geom := g.DelaunayTriangulation(1, false)
+
+	if geom == nil {
+		t.Errorf("Error: DelaunayTriangulation() error")
+	} else {
+		t.Logf("Log: DelaunayTriangulation() returns %q", geom.ToWKT())
+	}
+}
+
 func TestBuffer(t *testing.T) {
 	pt := CreatePoint(0, 0)
 
@@ -663,5 +904,32 @@ func TestOffsetCurve(t *testing.T) {
 		t.Errorf("Error: OffsetCurve() error")
 	} else {
 		t.Logf("Log: OffsetCurve() returns %q", geom.ToWKT())
+	}
+}
+
+func TestProject(t *testing.T) {
+	ln := CreateFromWKT("LINESTRING (0 0, 10 0, 10 10)")
+	pt := CreateFromWKT("POINT (5 2)")
+
+	if ln.Project(pt) != 5 {
+		t.Errorf("Error: Project() error")
+	}
+
+	if ln.ProjectNormalized(pt) != 0.25 {
+		t.Errorf("Error: Project() error")
+	}
+}
+
+func TestInterpolate(t *testing.T) {
+	ln := CreateFromWKT("LINESTRING (0 0, 10 0, 10 10)")
+
+	pt1 := ln.Interpolate(10)
+	if pt1 == nil || !pt1.Equals(CreatePoint(10, 0)) {
+		t.Errorf("Error: Interpolate() error")
+	}
+
+	pt2 := ln.InterpolateNormalized(0.25)
+	if pt2 == nil || !pt2.Equals(CreatePoint(5, 0)) {
+		t.Errorf("Error: InterpolateNormalized() error")
 	}
 }

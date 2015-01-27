@@ -153,12 +153,14 @@ func (g *Geometry) Distance(g2 *Geometry) float64 {
 	return float64(val)
 }
 
+// GEOS 3.2.0+ required
 func (g *Geometry) HausdorffDistance(g2 *Geometry) float64 {
 	var val C.double
 	C.GEOSHausdorffDistance_r(ctxHandle, g.c, g2.c, &val)
 	return float64(val)
 }
 
+// GEOS 3.2.0+ required
 func (g *Geometry) HausdorffDistanceDensify(g2 *Geometry, densifyFrac float64) float64 {
 	var val C.double
 
@@ -285,14 +287,97 @@ func (g *Geometry) IsClosed() bool {
 	return flag == C.char(1)
 }
 
-func (g *Geometry) ToWKT() string {
-	writer := createWktWriter()
-	return writer.write(g)
+func (g *Geometry) Envelope() *Geometry {
+	c := C.GEOSEnvelope_r(ctxHandle, g.c)
+	return geomFromC(c)
 }
 
-func (g *Geometry) ToWKB() []byte {
-	writer := createWkbWriter()
-	return writer.write(g)
+func (g *Geometry) Intersection(g2 *Geometry) *Geometry {
+	c := C.GEOSIntersection_r(ctxHandle, g.c, g2.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) ConvexHull() *Geometry {
+	c := C.GEOSConvexHull_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Difference(g2 *Geometry) *Geometry {
+	c := C.GEOSDifference_r(ctxHandle, g.c, g2.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) SymDifference(g2 *Geometry) *Geometry {
+	c := C.GEOSSymDifference_r(ctxHandle, g.c, g2.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Boundary() *Geometry {
+	c := C.GEOSBoundary_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Union(g2 *Geometry) *Geometry {
+	c := C.GEOSUnion_r(ctxHandle, g.c, g2.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) UnaryUnion() *Geometry {
+	c := C.GEOSUnaryUnion_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) PointOnSurface() *Geometry {
+	c := C.GEOSPointOnSurface_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Centroid() *Geometry {
+	c := C.GEOSGetCentroid_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Node() *Geometry {
+	c := C.GEOSNode_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+func (g *Geometry) Simplify(tol float64) *Geometry {
+	c := C.GEOSSimplify_r(ctxHandle, g.c, C.double(tol))
+	return geomFromC(c)
+}
+
+func (g *Geometry) TopologyPreserveSimplify(tol float64) *Geometry {
+	c := C.GEOSTopologyPreserveSimplify_r(ctxHandle, g.c, C.double(tol))
+	return geomFromC(c)
+}
+
+func (g *Geometry) ExtractUniquePoints() *Geometry {
+	c := C.GEOSGeom_extractUniquePoints_r(ctxHandle, g.c)
+	return geomFromC(c)
+}
+
+// Support LineString, LinearRing only
+func (g *Geometry) SharedPaths(line *Geometry) *Geometry {
+	c := C.GEOSSharedPaths_r(ctxHandle, g.c, line.c)
+	return geomFromC(c)
+}
+
+// GEOS 3.3.0+ required
+func (g *Geometry) Snap(g2 *Geometry, tol float64) *Geometry {
+	c := C.GEOSSnap_r(ctxHandle, g.c, g2.c, C.double(tol))
+	return geomFromC(c)
+}
+
+// GEOS 3.4.0+ required
+func (g *Geometry) DelaunayTriangulation(tol float64, onlyEdges bool) *Geometry {
+	onlyEdgesC := C.int(0)
+	if onlyEdges {
+		onlyEdgesC = C.int(1)
+	}
+
+	c := C.GEOSDelaunayTriangulation_r(ctxHandle, g.c, C.double(tol), onlyEdgesC)
+	return geomFromC(c)
 }
 
 func (g *Geometry) Buffer(width float64, quadsegs int, endCapStyle CapType, joinStyle JoinType, mitreLimit float64) *Geometry {
@@ -307,6 +392,40 @@ func (g *Geometry) OffsetCurve(width float64, quadsegs int, joinStyle JoinType, 
 	c := C.GEOSOffsetCurve_r(ctxHandle, g.c, C.double(width), C.int(quadsegs),
 		C.int(joinStyle), C.double(mitreLimit))
 	return geomFromC(c)
+}
+
+// Only support LineString.
+func (g *Geometry) Project(p *Geometry) float64 {
+	dis := C.GEOSProject_r(ctxHandle, g.c, p.c)
+	return float64(dis)
+}
+
+// Only support LineString.
+func (g *Geometry) ProjectNormalized(p *Geometry) float64 {
+	dis := C.GEOSProjectNormalized_r(ctxHandle, g.c, p.c)
+	return float64(dis)
+}
+
+// Only support LineString.
+func (g *Geometry) Interpolate(dis float64) *Geometry {
+	c := C.GEOSInterpolate_r(ctxHandle, g.c, C.double(dis))
+	return geomFromC(c)
+}
+
+// Only support LineString.
+func (g *Geometry) InterpolateNormalized(dis float64) *Geometry {
+	c := C.GEOSInterpolateNormalized_r(ctxHandle, g.c, C.double(dis))
+	return geomFromC(c)
+}
+
+func (g *Geometry) ToWKT() string {
+	writer := createWktWriter()
+	return writer.write(g)
+}
+
+func (g *Geometry) ToWKB() []byte {
+	writer := createWkbWriter()
+	return writer.write(g)
 }
 
 func CreateFromWKT(wkt string) *Geometry {
@@ -455,6 +574,24 @@ func CreateMultiGeometry(geoms []*Geometry, geomType GeometryType) *Geometry {
 	if geomCount > 0 {
 		geomsPtr := &geomsCs[0]
 		c := C.GEOSGeom_createCollection_r(ctxHandle, C.int(geomType), geomsPtr, C.uint(geomCount))
+		return geomFromC(c)
+	}
+
+	return nil
+}
+
+func Polygonize(geoms []*Geometry) *Geometry {
+	var geomsCs []*C.GEOSGeometry
+
+	for i := range geoms {
+		geom := geoms[i]
+		geomsCs = append(geomsCs, geom.c)
+	}
+
+	geomCount := len(geomsCs)
+	if geomCount > 0 {
+		geomsPtr := &geomsCs[0]
+		c := C.GEOSPolygonize_r(ctxHandle, geomsPtr, C.uint(geomCount))
 		return geomFromC(c)
 	}
 
