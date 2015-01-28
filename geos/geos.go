@@ -3,6 +3,10 @@ Package geos implements a wrapper for GEOS library.
 */
 package geos
 
+import (
+	"sync"
+)
+
 /*
 #cgo CFLAGS: -I/usr/local/include
 #cgo LDFLAGS: -L/usr/local/lib -lgeos_c
@@ -52,6 +56,7 @@ const (
 
 var (
 	ctxHandle C.GEOSContextHandle_t
+	mutex     sync.Mutex
 )
 
 func FinishGEOS() {

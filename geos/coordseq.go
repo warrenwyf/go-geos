@@ -89,18 +89,25 @@ func (s *coordSequence) toCoordZs() []CoordZ {
 	return coords
 }
 
-func coordSeqFromC(c *C.GEOSCoordSequence) *coordSequence {
+func coordSeqFromC(c *C.GEOSCoordSequence, hasOwnership bool) *coordSequence {
+	if c == nil {
+		return nil
+	}
+
 	coordSeq := &coordSequence{c: c}
-	runtime.SetFinalizer(coordSeq, func(coordSeq *coordSequence) {
-		C.GEOSCoordSeq_destroy_r(ctxHandle, coordSeq.c)
-	})
+
+	if hasOwnership {
+		runtime.SetFinalizer(coordSeq, func(cs *coordSequence) {
+			C.GEOSCoordSeq_destroy_r(ctxHandle, cs.c)
+		})
+	}
 
 	return coordSeq
 }
 
-func coordSeqFromCoords(coords []Coord) *coordSequence {
+func coordSeqFromCoords(coords []Coord, hasOwnership bool) *coordSequence {
 	size := len(coords)
-	coordSeq := createCoordSeq(size, 2)
+	coordSeq := createCoordSeq(size, 2, hasOwnership)
 
 	for i := 0; i < size; i++ {
 		coord := coords[i]
@@ -111,9 +118,9 @@ func coordSeqFromCoords(coords []Coord) *coordSequence {
 	return coordSeq
 }
 
-func coordSeqFromCoordZs(coords []CoordZ) *coordSequence {
+func coordSeqFromCoordZs(coords []CoordZ, hasOwnership bool) *coordSequence {
 	size := len(coords)
-	coordSeq := createCoordSeq(size, 3)
+	coordSeq := createCoordSeq(size, 3, hasOwnership)
 
 	for i := 0; i < size; i++ {
 		coord := coords[i]
@@ -125,11 +132,11 @@ func coordSeqFromCoordZs(coords []CoordZ) *coordSequence {
 	return coordSeq
 }
 
-func createCoordSeq(size, dims int) *coordSequence {
+func createCoordSeq(size, dims int, hasOwnership bool) *coordSequence {
 	c := C.GEOSCoordSeq_create_r(ctxHandle, C.uint(size), C.uint(dims))
 	if c == nil {
 		return nil
 	}
 
-	return coordSeqFromC(c)
+	return coordSeqFromC(c, hasOwnership)
 }

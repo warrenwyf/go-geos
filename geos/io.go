@@ -34,7 +34,7 @@ func (r *wktReader) read(wkt string) *Geometry {
 	defer C.free(unsafe.Pointer(cs))
 
 	c := C.GEOSWKTReader_read_r(ctxHandle, r.c, cs)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (w *wktWriter) write(g *Geometry) string {
@@ -50,7 +50,7 @@ func (r *wkbReader) read(wkb []byte) *Geometry {
 	}
 
 	c := C.GEOSWKBReader_read_r(ctxHandle, r.c, &cwkb[0], C.size_t(len(wkb)))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (r *wkbReader) readHex(wkb []byte) *Geometry {
@@ -60,7 +60,7 @@ func (r *wkbReader) readHex(wkb []byte) *Geometry {
 	}
 
 	c := C.GEOSWKBReader_readHEX_r(ctxHandle, r.c, &cwkb[0], C.size_t(len(wkb)))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (w *wkbWriter) write(g *Geometry) []byte {

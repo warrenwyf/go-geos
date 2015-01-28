@@ -67,7 +67,7 @@ type Geometry struct {
 
 func (g *Geometry) Clone() *Geometry {
 	c := C.GEOSGeom_clone_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) GetType() GeometryType {
@@ -88,7 +88,7 @@ func (g *Geometry) GetNumGeometries() int {
 
 func (g *Geometry) GetGeometryN(n int) *Geometry {
 	c := C.GEOSGetGeometryN_r(ctxHandle, g.c, C.int(n))
-	return geomFromC(c)
+	return geomFromC(c, false)
 }
 
 // Only support Polygon
@@ -99,13 +99,13 @@ func (g *Geometry) GetNumInteriorRings() int {
 // Only support Polygon
 func (g *Geometry) GetInteriorRingN(n int) *Geometry {
 	c := C.GEOSGetInteriorRingN_r(ctxHandle, g.c, C.int(n))
-	return geomFromC(c)
+	return geomFromC(c, false)
 }
 
 // Only support Polygon
 func (g *Geometry) GetExteriorRing() *Geometry {
 	c := C.GEOSGetExteriorRing_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, false)
 }
 
 func (g *Geometry) GetNumCoordinates() int {
@@ -124,14 +124,14 @@ func (g *Geometry) GetXY() (float64, float64) {
 // Only support LineString, LinearRing or Point
 func (g *Geometry) GetCoords() []Coord {
 	c := C.GEOSGeom_getCoordSeq_r(ctxHandle, g.c)
-	coordSeq := coordSeqFromC(c)
+	coordSeq := coordSeqFromC(c, false)
 	return coordSeq.toCoords()
 }
 
 // Only support LineString, LinearRing or Point
 func (g *Geometry) GetCoordZs() []CoordZ {
 	c := C.GEOSGeom_getCoordSeq_r(ctxHandle, g.c)
-	coordSeq := coordSeqFromC(c)
+	coordSeq := coordSeqFromC(c, false)
 	return coordSeq.toCoordZs()
 }
 
@@ -176,13 +176,13 @@ func (g *Geometry) HausdorffDistanceDensify(g2 *Geometry, densifyFrac float64) f
 
 func (g *Geometry) NearestPoints(g2 *Geometry) []Coord {
 	c := C.GEOSNearestPoints_r(ctxHandle, g.c, g2.c)
-	coordSeq := coordSeqFromC(c)
+	coordSeq := coordSeqFromC(c, true)
 	return coordSeq.toCoords()
 }
 
 func (g *Geometry) NearestPointZs(g2 *Geometry) []CoordZ {
 	c := C.GEOSNearestPoints_r(ctxHandle, g.c, g2.c)
-	coordSeq := coordSeqFromC(c)
+	coordSeq := coordSeqFromC(c, true)
 	return coordSeq.toCoordZs()
 }
 
@@ -289,84 +289,84 @@ func (g *Geometry) IsClosed() bool {
 
 func (g *Geometry) Envelope() *Geometry {
 	c := C.GEOSEnvelope_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Intersection(g2 *Geometry) *Geometry {
 	c := C.GEOSIntersection_r(ctxHandle, g.c, g2.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) ConvexHull() *Geometry {
 	c := C.GEOSConvexHull_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Difference(g2 *Geometry) *Geometry {
 	c := C.GEOSDifference_r(ctxHandle, g.c, g2.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) SymDifference(g2 *Geometry) *Geometry {
 	c := C.GEOSSymDifference_r(ctxHandle, g.c, g2.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Boundary() *Geometry {
 	c := C.GEOSBoundary_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Union(g2 *Geometry) *Geometry {
 	c := C.GEOSUnion_r(ctxHandle, g.c, g2.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) UnaryUnion() *Geometry {
 	c := C.GEOSUnaryUnion_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) PointOnSurface() *Geometry {
 	c := C.GEOSPointOnSurface_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Centroid() *Geometry {
 	c := C.GEOSGetCentroid_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Node() *Geometry {
 	c := C.GEOSNode_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Simplify(tol float64) *Geometry {
 	c := C.GEOSSimplify_r(ctxHandle, g.c, C.double(tol))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) TopologyPreserveSimplify(tol float64) *Geometry {
 	c := C.GEOSTopologyPreserveSimplify_r(ctxHandle, g.c, C.double(tol))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) ExtractUniquePoints() *Geometry {
 	c := C.GEOSGeom_extractUniquePoints_r(ctxHandle, g.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // Support LineString, LinearRing only
 func (g *Geometry) SharedPaths(line *Geometry) *Geometry {
 	c := C.GEOSSharedPaths_r(ctxHandle, g.c, line.c)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // GEOS 3.3.0+ required
 func (g *Geometry) Snap(g2 *Geometry, tol float64) *Geometry {
 	c := C.GEOSSnap_r(ctxHandle, g.c, g2.c, C.double(tol))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // GEOS 3.4.0+ required
@@ -377,13 +377,13 @@ func (g *Geometry) DelaunayTriangulation(tol float64, onlyEdges bool) *Geometry 
 	}
 
 	c := C.GEOSDelaunayTriangulation_r(ctxHandle, g.c, C.double(tol), onlyEdgesC)
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) Buffer(width float64, quadsegs int, endCapStyle CapType, joinStyle JoinType, mitreLimit float64) *Geometry {
 	c := C.GEOSBufferWithStyle_r(ctxHandle, g.c, C.double(width), C.int(quadsegs),
 		C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // Only support LineString.
@@ -391,7 +391,7 @@ func (g *Geometry) Buffer(width float64, quadsegs int, endCapStyle CapType, join
 func (g *Geometry) OffsetCurve(width float64, quadsegs int, joinStyle JoinType, mitreLimit float64) *Geometry {
 	c := C.GEOSOffsetCurve_r(ctxHandle, g.c, C.double(width), C.int(quadsegs),
 		C.int(joinStyle), C.double(mitreLimit))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // Only support LineString.
@@ -409,13 +409,13 @@ func (g *Geometry) ProjectNormalized(p *Geometry) float64 {
 // Only support LineString.
 func (g *Geometry) Interpolate(dis float64) *Geometry {
 	c := C.GEOSInterpolate_r(ctxHandle, g.c, C.double(dis))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 // Only support LineString.
 func (g *Geometry) InterpolateNormalized(dis float64) *Geometry {
 	c := C.GEOSInterpolateNormalized_r(ctxHandle, g.c, C.double(dis))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func (g *Geometry) ToWKT() string {
@@ -439,7 +439,7 @@ func CreateFromWKB(wkb []byte) *Geometry {
 }
 
 func CreatePoint(x, y float64) *Geometry {
-	s := createCoordSeq(1, 2)
+	s := createCoordSeq(1, 2, false)
 	if s == nil || s.c == nil {
 		return nil
 	}
@@ -452,11 +452,11 @@ func CreatePoint(x, y float64) *Geometry {
 		return nil
 	}
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreatePointZ(x, y, z float64) *Geometry {
-	s := createCoordSeq(1, 3)
+	s := createCoordSeq(1, 3, false)
 	if s == nil || s.c == nil {
 		return nil
 	}
@@ -470,35 +470,35 @@ func CreatePointZ(x, y, z float64) *Geometry {
 		return nil
 	}
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreateLinearRing(coords []Coord) *Geometry {
-	coordSeq := coordSeqFromCoords(coords)
+	coordSeq := coordSeqFromCoords(coords, false)
 	c := C.GEOSGeom_createLinearRing_r(ctxHandle, coordSeq.c)
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreateLinearRingZ(coords []CoordZ) *Geometry {
-	coordSeq := coordSeqFromCoordZs(coords)
+	coordSeq := coordSeqFromCoordZs(coords, false)
 	c := C.GEOSGeom_createLinearRing_r(ctxHandle, coordSeq.c)
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreateLineString(coords []Coord) *Geometry {
-	coordSeq := coordSeqFromCoords(coords)
+	coordSeq := coordSeqFromCoords(coords, false)
 	c := C.GEOSGeom_createLineString_r(ctxHandle, coordSeq.c)
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreateLineStringZ(coords []CoordZ) *Geometry {
-	coordSeq := coordSeqFromCoordZs(coords)
+	coordSeq := coordSeqFromCoordZs(coords, false)
 	c := C.GEOSGeom_createLineString_r(ctxHandle, coordSeq.c)
 
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreatePolygon(shell []Coord, holes ...[]Coord) *Geometry {
@@ -506,13 +506,18 @@ func CreatePolygon(shell []Coord, holes ...[]Coord) *Geometry {
 	if shellGeom == nil {
 		return nil
 	}
+	shellGeom.giveupOwnership()
 	shellC := shellGeom.c
 
 	var holesPtr **C.GEOSGeometry
 	var holeCs []*C.GEOSGeometry
 	for i := range holes {
 		holeGeom := CreateLinearRing(holes[i])
-		holeCs = append(holeCs, holeGeom.c)
+
+		if holeGeom != nil {
+			holeGeom.giveupOwnership()
+			holeCs = append(holeCs, holeGeom.c)
+		}
 	}
 
 	holeCount := len(holeCs)
@@ -521,7 +526,7 @@ func CreatePolygon(shell []Coord, holes ...[]Coord) *Geometry {
 	}
 
 	c := C.GEOSGeom_createPolygon_r(ctxHandle, shellC, holesPtr, C.uint(holeCount))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreatePolygonZ(shell []CoordZ, holes ...[]CoordZ) *Geometry {
@@ -529,13 +534,18 @@ func CreatePolygonZ(shell []CoordZ, holes ...[]CoordZ) *Geometry {
 	if shellGeom == nil {
 		return nil
 	}
+	shellGeom.giveupOwnership()
 	shellC := shellGeom.c
 
 	var holesPtr **C.GEOSGeometry
 	var holeCs []*C.GEOSGeometry
 	for i := range holes {
 		holeGeom := CreateLinearRingZ(holes[i])
-		holeCs = append(holeCs, holeGeom.c)
+
+		if holeGeom != nil {
+			holeGeom.giveupOwnership()
+			holeCs = append(holeCs, holeGeom.c)
+		}
 	}
 
 	holeCount := len(holeCs)
@@ -544,7 +554,7 @@ func CreatePolygonZ(shell []CoordZ, holes ...[]CoordZ) *Geometry {
 	}
 
 	c := C.GEOSGeom_createPolygon_r(ctxHandle, shellC, holesPtr, C.uint(holeCount))
-	return geomFromC(c)
+	return geomFromC(c, true)
 }
 
 func CreateMultiGeometry(geoms []*Geometry, geomType GeometryType) *Geometry {
@@ -567,6 +577,7 @@ func CreateMultiGeometry(geoms []*Geometry, geomType GeometryType) *Geometry {
 			}
 		}
 
+		geom.giveupOwnership()
 		geomsCs = append(geomsCs, geom.c)
 	}
 
@@ -574,7 +585,7 @@ func CreateMultiGeometry(geoms []*Geometry, geomType GeometryType) *Geometry {
 	if geomCount > 0 {
 		geomsPtr := &geomsCs[0]
 		c := C.GEOSGeom_createCollection_r(ctxHandle, C.int(geomType), geomsPtr, C.uint(geomCount))
-		return geomFromC(c)
+		return geomFromC(c, true)
 	}
 
 	return nil
@@ -585,6 +596,8 @@ func Polygonize(geoms []*Geometry) *Geometry {
 
 	for i := range geoms {
 		geom := geoms[i]
+
+		geom.giveupOwnership()
 		geomsCs = append(geomsCs, geom.c)
 	}
 
@@ -592,17 +605,33 @@ func Polygonize(geoms []*Geometry) *Geometry {
 	if geomCount > 0 {
 		geomsPtr := &geomsCs[0]
 		c := C.GEOSPolygonize_r(ctxHandle, geomsPtr, C.uint(geomCount))
-		return geomFromC(c)
+		return geomFromC(c, true)
 	}
 
 	return nil
 }
 
-func geomFromC(c *C.GEOSGeometry) *Geometry {
+func geomFromC(c *C.GEOSGeometry, hasOwnership bool) *Geometry {
+	if c == nil {
+		return nil
+	}
+
 	geom := &Geometry{c: c}
-	runtime.SetFinalizer(geom, func(geom *Geometry) {
-		C.GEOSGeom_destroy_r(ctxHandle, geom.c)
-	})
+
+	if hasOwnership {
+		runtime.SetFinalizer(geom, func(g *Geometry) {
+			C.GEOSGeom_destroy_r(ctxHandle, g.c)
+		})
+	}
 
 	return geom
+}
+
+// Geometry used to construct another geometry must give up its ownership.
+func (g *Geometry) giveupOwnership() {
+	if g == nil {
+		return
+	}
+
+	runtime.SetFinalizer(g, nil)
 }

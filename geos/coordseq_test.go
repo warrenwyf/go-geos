@@ -5,7 +5,7 @@ import (
 )
 
 func TestConstructor(t *testing.T) {
-	s := createCoordSeq(2, 3)
+	s := createCoordSeq(2, 3, true)
 
 	s.setX(1, 1)
 	s.setY(1, 2)
@@ -35,7 +35,7 @@ func TestConstructor(t *testing.T) {
 }
 
 func TestToCoords(t *testing.T) {
-	s := createCoordSeq(2, 3)
+	s := createCoordSeq(2, 3, true)
 
 	coords := s.toCoords()
 	if len(coords) != 2 {
