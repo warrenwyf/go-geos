@@ -32,6 +32,6 @@ import (
 
 func main() {
 	geom := geos.CreatePoint(0, 0)
-	wkt := geom.Buffer(10, 8, geos.CAP_ROUND, geos.JOIN_ROUND, 5).ToWKT()
+	wkt := geom.Buffer(10).ToWKT()
 }
 ```

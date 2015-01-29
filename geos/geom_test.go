@@ -871,12 +871,12 @@ func TestDelaunayTriangulation(t *testing.T) {
 
 func TestBuffer(t *testing.T) {
 	pt := CreatePoint(0, 0)
+	var geom *Geometry
 
 	width := 10.0
 	quadsegs := 8
 
-	geom := pt.Buffer(width, quadsegs, CAP_ROUND, JOIN_ROUND, 5)
-
+	geom = pt.Buffer(width)
 	if geom == nil {
 		t.Errorf("Error: Buffer() error")
 	} else {
@@ -885,6 +885,18 @@ func TestBuffer(t *testing.T) {
 			t.Errorf("Error: Buffer() returns error polygon")
 		} else {
 			t.Logf("Log: Buffer([0, 0]) returns %q", geom.ToWKT())
+		}
+	}
+
+	geom = pt.BufferWithStyle(width, quadsegs, CAP_ROUND, JOIN_ROUND, 5)
+	if geom == nil {
+		t.Errorf("Error: BufferWithStyle() error")
+	} else {
+		ptCount := geom.GetNumCoordinates()
+		if ptCount != 4*quadsegs+1 {
+			t.Errorf("Error: BufferWithStyle() returns error polygon")
+		} else {
+			t.Logf("Log: BufferWithStyle([0, 0]) returns %q", geom.ToWKT())
 		}
 	}
 }

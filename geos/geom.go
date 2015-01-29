@@ -380,7 +380,12 @@ func (g *Geometry) DelaunayTriangulation(tol float64, onlyEdges bool) *Geometry 
 	return geomFromC(c, true)
 }
 
-func (g *Geometry) Buffer(width float64, quadsegs int, endCapStyle CapType, joinStyle JoinType, mitreLimit float64) *Geometry {
+func (g *Geometry) Buffer(width float64) *Geometry {
+	c := C.GEOSBuffer_r(ctxHandle, g.c, C.double(width), C.int(8))
+	return geomFromC(c, true)
+}
+
+func (g *Geometry) BufferWithStyle(width float64, quadsegs int, endCapStyle CapType, joinStyle JoinType, mitreLimit float64) *Geometry {
 	c := C.GEOSBufferWithStyle_r(ctxHandle, g.c, C.double(width), C.int(quadsegs),
 		C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit))
 	return geomFromC(c, true)
