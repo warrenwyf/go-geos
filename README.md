@@ -9,7 +9,7 @@ Install
 ### Requirements
 
  * GEOS Library installed
- * Get source code with command `go get github.com/warrenwyf/go-geos/geos`
+ * Get source code with command `go get github.com/warrenwyf/go-geos`
  * Change `CFLAGS` and `LDFLAGS` in source code to your library path
 
 
