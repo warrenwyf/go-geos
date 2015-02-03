@@ -6,7 +6,7 @@ go:
 before_install:
   - sudo apt-add-repository -y ppa:ubuntugis/ppa
   - sudo apt-get update -q
-  - sudo apt-get install -q libgeos
+  - sudo apt-get install -q libgeos-dev
 
 script: go test -v ./...
 notifications:
