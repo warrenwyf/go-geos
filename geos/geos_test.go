@@ -6,6 +6,8 @@ import (
 )
 
 func TestVersionConsts(t *testing.T) {
+	t.Logf("Log: Version=%q", GEOS_VERSION)
+
 	if GEOS_CAPI_VERSION_MAJOR <= 0 {
 		t.Errorf("Error: GEOS_CAPI_VERSION_MAJOR=%d", GEOS_CAPI_VERSION_MAJOR)
 	}
