@@ -4,8 +4,8 @@ Package geos implements a wrapper for GEOS library.
 package geos
 
 /*
-#cgo CFLAGS: -I/usr/local/include
-#cgo LDFLAGS: -L/usr/local/lib -lgeos_c
+#cgo CFLAGS: -I/usr/local/include -I/usr/include
+#cgo LDFLAGS: -L/usr/local/lib -L/usr/lib -lgeos_c
 #include <geos_c.h>
 #include <stdlib.h>
 #include <stdio.h>
