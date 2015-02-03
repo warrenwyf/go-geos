@@ -1,0 +1,15 @@
+language: go
+
+go:
+  - 1.1
+  - tip
+
+before_install:
+  - sudo add-apt-repository ppa:ubuntugis/ppa
+  - sudo apt-get update
+  - sudo apt-get install libgeos
+
+script: go test -v ./...
+notifications:
+  email:
+    - warrenwyf@gmail.com
