@@ -1,6 +1,9 @@
 # go-geos
 =========
+
 It is a Go binding for [GEOS](http://trac.osgeo.org/geos/)
+
+[![CI Status](https://travis-ci.org/warrenwyf/go-geos.png?branch=master)](https://travis-ci.org/warrenwyf/go-geos)
 
 
 Install
