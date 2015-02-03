@@ -174,12 +174,14 @@ func (g *Geometry) HausdorffDistanceDensify(g2 *Geometry, densifyFrac float64) f
 	return float64(val)
 }
 
+// GEOS 3.4.0+ required
 func (g *Geometry) NearestPoints(g2 *Geometry) []Coord {
 	c := C.GEOSNearestPoints_r(ctxHandle, g.c, g2.c)
 	coordSeq := coordSeqFromC(c, true)
 	return coordSeq.toCoords()
 }
 
+// GEOS 3.4.0+ required
 func (g *Geometry) NearestPointZs(g2 *Geometry) []CoordZ {
 	c := C.GEOSNearestPoints_r(ctxHandle, g.c, g2.c)
 	coordSeq := coordSeqFromC(c, true)
@@ -337,6 +339,7 @@ func (g *Geometry) Centroid() *Geometry {
 	return geomFromC(c, true)
 }
 
+// GEOS 3.4.0+ required
 func (g *Geometry) Node() *Geometry {
 	c := C.GEOSNode_r(ctxHandle, g.c)
 	return geomFromC(c, true)
